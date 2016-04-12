@@ -1,0 +1,80 @@
+﻿@model IEnumerable<MvcToDo.ModelsView.TaskList>
+
+@{
+    ViewBag.Title = "Index";
+    @Styles.Render("~/Content/themes/base/css")
+}
+<link href="~/Content/datatables.min.css" rel="stylesheet" />
+<p>
+</p>
+<div class="row">
+    <div class="col-md-4">
+        @if (User.IsInRole("admin") || User.IsInRole("taskCRUD"))
+        {
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> @Html.ActionLink("Create New", "Create")  @:&nbsp; &nbsp;
+        }
+        <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span> @Html.ActionLink("Board Mode", "Board")
+    </div>
+    <div class="col-md-8">
+        <div class="pull-right form-inline">
+            @using (Html.BeginForm("Index", "TaskItems", FormMethod.Get))
+            {
+                @Html.DropDownList("CategoryId", (SelectList)ViewBag.TCategories, "Filter Category", new { @class = "form-control" }) @:&nbsp;
+                @Html.DropDownList("UserId", (SelectList)ViewBag.TUsers, "Filter User", new { @class = "form-control" }) @:&nbsp;
+                @Html.JQueryUI().Datepicker("DueDate", null, new { @class = "form-control", placeholder = "Due Date" }) @:&nbsp;
+                <input type="submit" value="Filter" class="btn btn-default" />
+            }
+        </div>
+    </div>
+@*</div>
+<div class="row">*@
+    <p class="clearfix"></p>
+    <div class="col-md-12">
+        <table id="itemContent" class="table table-fixed">
+            <thead>
+                <tr>
+                    <th id="tName">
+                        @Html.DisplayNameFor(model => model.Name)
+
+                    </th>
+                    <th id="tMode">
+                        @Html.DisplayNameFor(model => model.Mode)
+                    </th>
+                    <th id="tPriority">
+                        @Html.DisplayNameFor(model => model.Priority)
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="tContent">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="col1">
+                            @Html.ActionLink(item.Name, "Details", new { id = item.Id }, new { @style = "text-decoration:none" })
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Mode)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Priority)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryui")
+    <script src="~/Scripts/datatables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#itemContent').DataTable({
+                "info": false
+            });
+        });
+    </script>
+}

@@ -1,0 +1,6 @@
+﻿@model int
+@if (User.IsInRole("admin") || User.IsInRole("projectCRUD"))
+{
+    @Html.ActionLink("Edit", "Edit", new { id = Model }, new { @class="smallLinks" }) @:&nbsp;
+    @Html.ActionLink("Delete", "Delete", new { id = Model }, new { @class = "smallLinks" })
+}

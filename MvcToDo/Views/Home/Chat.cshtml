@@ -1,0 +1,77 @@
+﻿@model IEnumerable<MvcToDo.ModelsView.StringList>
+@{
+    ViewBag.Title = "Chat";
+
+    var claimCurrentName = System.Security.Claims.ClaimsPrincipal.Current.Claims.FirstOrDefault(c => c.Type == "MvcToDo:UserFullName");
+    if (claimCurrentName != null)
+    {
+        @Html.Hidden("displayname", claimCurrentName.Value)
+    }
+    else
+    {
+        @Html.Hidden("displayname", "Unknown")
+    }
+    @Styles.Render("~/Content/chat/css")
+}
+@Html.Hidden("sendto", "")
+@Html.Hidden("myid", User.Identity.Name)
+@Html.Hidden("chatTabIsVisibile", "true")
+<div id="usersSection" style="display:none;">
+    <div class="list-group">
+        @foreach (var item in Model)
+        {
+            <a href="#" onclick="prepareSend('@item.Id');" class="list-group-item">
+                <span id="sp_@item.Id" class="label label-primary">On</span>
+                <span id="badge_@item.Id" class="badge" style="display: none;">**</span>
+                <span id="displayas_@item.Id">@item.Name</span>
+            </a>
+        }
+    </div>
+</div>
+<!--/users 2-->
+<p>&nbsp;</p>
+<div class="row">
+    <div id="chatHistory" class="form-group">
+        <div class="col-md-10">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <ul class="chat" id="chatList"></ul>
+                </div>
+            </div>
+            <div class="panel panel-primary" style="margin-bottom:0;">
+                <div class="form-group">
+                    <textarea id="message" maxlength="1000" class="col-md-10 form-control" style="min-width:100%;" placeholder="Type your message here..."></textarea>
+                </div>
+                <div class="form-group pull-right" style="margin:3px;">
+                    <label style="color:#706f6f; font-size:x-small">
+                        <input id="sendOnEnterKey" type="checkbox" class="checkbox-inline" checked="checked"> Press enter to send
+                    </label>
+                    <button class="btn btn-warning" id="sendmessage">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    @Scripts.Render("~/bundles/chatpage")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            try {
+                $('#usersSection').BootSideMenu({ side: "right",autoClose: false });
+                $('#usersSection').show();
+                // disble controls, we well enable them when user clicks on a user in right panel
+                $("#message").prop('disabled',true);
+                $("#sendOnEnterKey").prop('disabled',true);
+                $("#sendmessage").prop('disabled',true);
+                $("#chatTabIsVisibile").val("true");
+                $("footer").hide(); // hide footer, need a bigger screen for chat
+
+                $('[id^="sp_"]').hide();
+            } catch (e) {
+                console.error(e.description);
+            }
+        });
+        </script>
+}

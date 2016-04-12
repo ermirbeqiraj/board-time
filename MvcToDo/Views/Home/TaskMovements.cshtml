@@ -1,0 +1,88 @@
+﻿@model List<MvcToDo.ModelsView.TaskMovementsView>
+
+@{
+    ViewBag.Title = "TaskMovements";
+}
+<link href="~/Content/MovementsStyle.css" rel="stylesheet" />
+<h2>Task Movements</h2>
+<div class="row">
+    @Html.Hidden("totalCount", (string)ViewBag.total)
+    <div id="notificationContainer" class="col-md-12">
+        @foreach (var item in Model)
+        {
+            <div class="notificationItem">
+                <h4>
+                    @item.Actor <text> <span class="text-muted">at</span>  @item.Created</text>
+                </h4>
+                <p>
+                    Moved task
+                    @Html.ActionLink(item.TaskName, "Details", "TaskItems", new { id = item.TaskId, projectId = item.ProjectId }, new { })
+                    from
+                    <span class="text-warning">@item.FromMode</span>
+                    to
+                    <span class="text-warning">
+                        @item.ToMode
+                    </span>
+                </p>
+            </div>
+        }
+    </div>
+    <div class="col-md-12">
+        <div class="form-group">
+            <span class="glyphicon glyphicon-sort-by-attributes"></span>
+            <button class="btn btn-link" id="btnShowMore">Show More</button>
+        </div>
+
+        <div id="loading" class="row">
+            <div class="col-md-2 col-md-offset-5">
+                <img alt="Getting db data ..." src="~/Content/image/ajax-loader.gif" class="img-circle" />
+                <ul id="loadingError"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(function () {
+            $('#loading').hide();
+
+            $("#btnShowMore").click(function () {
+                var url = "/Home/GetMovementsJson";
+                var data = { skip: $('#totalCount').val() };
+                $.getJSON(url,data,function (dbData) {
+                    try {
+                        var tot = parseInt(dbData.length) + parseInt($('#totalCount').val());
+                        $('#totalCount').val(tot);
+
+                        $.each(dbData,function (i,item) {
+
+                            var onclck = '@Url.Action("Details","TaskItems")?projectId=' + item.ProjectId + '&id=' + item.TaskId + '';
+
+                            $("#notificationContainer")
+                                .append("<div class='notificationItem fading'>"
+                                + "<h4>" + item.Actor + " <text><span class='text-muted'>at</span> " + item.Created + " </text></h4>"
+                                + "<p> Moved task "
+                                + "<a href='" + onclck + "'>" + item.TaskName + "</a>"
+                                + " from <span class='text-warning'>" + item.FromMode + " </span> to "
+                                + " <span class='text-warning'> " + item.ToMode + " </span> "
+                                + "</p> </div>");
+                        });
+                    } catch (e) {
+                        console.error(e.description);
+                    }
+                });
+            });
+        });
+
+        $(document).ajaxStart(function () {
+            $("#loading").show();
+        })
+        .ajaxComplete(function () {
+            $("#loading").hide();
+        })
+        .ajaxError(function (event,request,settings) {
+            $("#loadingError").append("<li>Error requesting page " + settings.url + "</li>");
+        });
+
+    </script>
+}

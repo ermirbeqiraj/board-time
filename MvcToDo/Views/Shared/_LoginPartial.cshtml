@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNet.Identity
+@using System.Security.Claims
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+    @Html.AntiForgeryToken()
+
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            @if (!User.IsInRole("customer"))
+            {
+                <a href="~/Home/Chat">Chat <span id="chatNews" style="display:none;" class="glyphicon glyphicon-asterisk"></span></a>
+            }
+        </li>
+        <li>
+            @{
+            var claimCurrentName = ClaimsPrincipal.Current.Claims.FirstOrDefault(c => c.Type == "MvcToDo:UserFullName");
+            if (claimCurrentName != null)
+            {
+                @Html.ActionLink(claimCurrentName.Value, "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+            }
+            else
+            {
+                @Html.ActionLink(User.Identity.Name, "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+            }
+            }
+        </li>
+        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+    </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        @*<li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>*@
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

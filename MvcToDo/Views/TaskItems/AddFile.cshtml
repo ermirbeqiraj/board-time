@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "Add File";
+}
+
+<h2>Add File</h2>
+
+@using (Html.BeginForm("AddFile", "TaskItems", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.Label("Task Name", new { @class= "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.Label((string)@ViewBag.TaskName, new { @class = "control-label col-md2" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("Choose File", new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="file" name="upload" />
+            </div>
+            @Html.Hidden("Id", (int)ViewBag.TaskId)
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+<p>
+    @Html.ActionLink("Cancel", "Files", new { Id = ViewBag.TaskId }, new { @class = "btn btn-link" })
+</p>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

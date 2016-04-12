@@ -1,0 +1,49 @@
+﻿@model IEnumerable<MvcToDo.Models.Files>
+
+@{
+    ViewBag.Title = "Files";
+}
+
+<h2>Files</h2>
+
+<p>
+    @if (User.IsInRole("admin") || User.IsInRole("taskAddFiles")) 
+    {
+        @Html.ActionLink("Create New", "AddFile", new { Id = (int)ViewBag.TaskId }) @:|
+        @Html.ActionLink("Copy From Task", "CopyFile", new { Id = (int)ViewBag.TaskId }) @:|
+    }
+    
+    @Html.ActionLink("Back To Board", "Board")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.FileName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ContentType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Created)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.FileName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ContentType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Created)
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "DeleteFile", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

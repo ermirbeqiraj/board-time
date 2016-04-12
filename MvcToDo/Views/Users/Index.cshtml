@@ -1,0 +1,47 @@
+﻿@model IEnumerable<MvcToDo.ModelsView.ViewUser>
+
+@{
+    ViewBag.Title = "Users";
+}
+
+<h2>Index</h2>
+@if (User.IsInRole("admin"))
+{
+    <p>
+        @Html.ActionLink("Create New", "Create")
+    </p>
+}
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Roles)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @foreach (var r in item.Roles)
+            {
+                <span class="label label-primary">@r</span> @: &nbsp;
+            }
+        </td>
+        <td>
+            @if (User.IsInRole("admin"))
+            {
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) @:|
+                @Html.ActionLink("Change Password", "ChangePassword", new { id = item.Id }) @:|
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            }
+        </td>
+    </tr>
+}
+
+</table>

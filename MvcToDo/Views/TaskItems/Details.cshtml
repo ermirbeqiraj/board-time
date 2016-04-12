@@ -1,0 +1,270 @@
+﻿
+@model MvcToDo.ModelsView.TaskItemView
+@{
+    ViewBag.Title = "Details";
+}
+<style>.commentItem{padding:20px;margin:20px 0;border:1px solid #eee;border-left-width:5px;border-radius:3px;border-left-color:#0094ff}</style>
+<div class="col-md-12">
+    <h3>Task Details</h3>
+        <div class="btn-group pull-right" role="group">
+            @Html.ActionLink("Back to Board", "Board", new { }, new { @class = "btn btn-default" })
+            @Html.Partial("_TaskAction")
+        </div>
+        <div class="row">
+            &nbsp;
+        </div>
+    <hr />
+</div>
+<div>
+    <p>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    </p>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ProjectName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProjectName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TaskMark)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TaskMark)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        @if (Model.ParentId.HasValue)
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.ParentId)
+            </dt>
+
+            <dd>
+                @Html.ActionLink((string)ViewBag.ParentTask, "Details", new { id = Model.ParentId })
+            </dd>
+        }
+        <dt>
+            @Html.DisplayNameFor(model => model.DueDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DueDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Priority)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Priority)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeEstimated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TimeEstimated)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Created)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Created)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastModified)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastModified)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Author)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Author)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TaskAssigned)
+        </dt>
+        <dd>
+            @{
+                string[] assigned = Model.TaskAssigned.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var item in assigned)
+                {
+                    <label class="label label-primary">@item</label> @: &nbsp;
+                }
+            }
+        </dd>
+    </dl>
+
+</div>
+@* Description *@
+<div>
+    <h3>Task Description</h3>
+    <hr />
+    <p>
+        @Html.DisplayFor(model => model.Description)
+    </p>
+</div>
+@* files *@
+<div id="filesSection">
+    <h3>Task Files </h3>
+    <hr />
+    <p>
+        <table class="table table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th>
+                        File Name
+                    </th>
+                    <th class="hidden-xs">
+                        File Type
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.UploadedFiles)
+                {
+                    <tr>
+                        <td>
+                            <text>@item.FileName</text>
+                        </td>
+                        <td class="hidden-xs">
+                            <text> @item.ContentType</text>
+                        </td>
+                        <td>
+                            @Html.ActionLink("Get file", "DownloadFile", new { FileId = item.Id, Id = Model.Id }, new { @class="btn btn-link" })
+
+                            @{
+                                switch (item.ContentType)
+                                {
+                                    case "image/jpg":
+                                    case "image/jpeg":
+                                    case "image/pjpeg":
+                                    case "image/gif":
+                                    case "image/x-png":
+                                    case "image/png":
+
+                                        <button type="button" class="btn btn-link"
+                                                data-toggle="modal" data-target="#modalContent_@item.Id">
+                                            Open
+                                        </button>
+                                            <div id="modalContent_@item.Id" class="modal bs-example-modal-lg" tabindex="-1" role="dialog">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <img id="imageItem_@item.Id" style="margin: 0 auto;" class="img-responsive" 
+                                                             src="@String.Format("data:" + @item.ContentType + ";base64,{0}", Convert.ToBase64String(item.FileContent))" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                     break;
+                                    }
+                                }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </p>
+</div>
+<div id="commentsSection">
+    <h3>
+        Comments
+    </h3>
+    <hr />
+
+    @foreach (var item in Model.Comments)
+    {
+        <div class="commentItem">
+            <h4> &oplus; @Html.Encode(item.Author) &#64; @Html.Encode(item.Created.Value.ToString()) </h4>
+            <p>
+                @Html.Raw(item.Comment)
+            </p>
+        </div>
+    }
+</div>
+<div>
+    <br />
+    @* script for ckeditor *@
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <h4>Add Comment</h4>
+    @using (Html.BeginForm("AddComment", "TaskItems", null, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            <div class="form-group">
+                <div class="col-md-10">
+                    @Html.TextArea("Comment", new { maxlength=3500})
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-default" />    
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@Html.Hidden("filesCount", (string)ViewBag.totalFiles)
+@Html.Hidden("commentsCount", (string)ViewBag.totalComments)
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            CKEDITOR.replace('Comment',{ htmlEncodeOutput: true });
+            try {
+
+                var totComments = parseInt($("#filesCount").val());
+                var totFiles = parseInt($("#commentsCount").val());
+
+                if (totComments == 0) {
+                    $("#filesSection").hide();
+                }
+                if (totFiles == 0) {
+                    $("#commentsSection").hide();
+                }
+            } catch (e) {
+                console.error(e.description);
+            }
+        });
+    </script>
+
+}

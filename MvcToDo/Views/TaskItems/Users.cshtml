@@ -1,0 +1,43 @@
+﻿@model MvcToDo.ModelsView.AtachUserToTask
+
+@{
+    ViewBag.Title = "Users";
+}
+
+<h2>Users</h2>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>TaskAssigned</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            <div class="col-md-10">
+                @Html.CheckBoxListFor(model => model.UsersToAdd
+                                    , model => model.UsersToAdd
+                                    , model => model.Id
+                                    , model => model.Name
+                                    , model => model.Checked
+                                    , model => new { @class = "checkbox-inline" })
+
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

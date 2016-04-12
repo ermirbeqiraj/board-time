@@ -1,0 +1,311 @@
+﻿@{
+    ViewBag.Title = "Documentation";
+}
+<link href="~/Content/documentation.css" rel="stylesheet" />
+<div class="jumbotron">
+    <h2>Documentation</h2>
+    <p>
+        Check this page on how to use the app.
+    </p>
+</div>
+<div class="row">
+    <div class="col-md-3" id="leftCol">
+        <ul class="nav nav-stacked" id="sidebar">
+            <li><a href="#gettingStarted">Getting Started</a></li>
+            <li><a href="#customers">Customers</a></li>
+            <li><a href="#security">Users & Roles</a></li>
+            <li><a href="#tasks">Tasks</a></li>
+            <li><a href="#chat">Live Chat</a></li>
+            <li><a href="#statistics">Statistics</a></li>
+            <li><a href="#contact">Contact & Licence</a></li>
+        </ul>
+    </div>
+    <div class="col-md-9" id="mainCol">
+        <h2 id="gettingStarted">Getting Started</h2>
+        If this is very first time for you running this project, use the default credentials provided at the web.config for logging into the app.
+        <article>
+            Board-Time is a web application based on Asp.Net Mvc 5 for managing work progress on your project by:
+            <ul>
+                <li>
+                    Setting projects your company is working on
+                </li>
+                <li>
+                    Specifying relations between projects and customers
+                </li>
+                <li>
+                    Setting Tasks/TODO's ,attaching them to your developers
+                </li>
+                <li>
+                    Categorize tasks and create phases on which a task can go through
+                </li>
+                <li>
+                    etc..
+                </li>
+            </ul>
+            <p>
+                In web.config under application settings you can change the values for autocreation of user,Board-Columns and task categories.
+                The defaults are as follows :<br />
+                <code>
+                    &lt;add key="createDefaultTaskMarkCat" value="true" /&gt; <br />
+                    &lt;add key="createAdminUser" value="true" /&gt; <br />
+                    &lt;add key="defaultAdminEmail" value="admin@boardtime.com"/&gt;<br />
+                    &lt;add key="defaultAdminPass" value="****"/&gt;<br />
+                    &lt;add key="defaultAdminName" value="Admin"/&gt;
+                </code><br />
+                <em>Note: After you login please change imideatly the password for this user</em>
+            </p>
+            <p>
+                To get started you need to modify your Kanban board columns and task categories so they can met your company needs.<br />
+                The default values are like this :
+                <div class="row">
+                    <div class="col-md-12">
+                        <img src="~/Content/image/Kanban.png" class="img-responsive" title="Task Board" />
+                    </div>
+                </div>
+
+                The default values for board columns are : Backlog,Ready,Work in progress,Done,Tested <br />
+                The default options for task categories are : Feauture,Bug,Question.<br />
+            </p>
+        </article>
+        <hr />
+        <h2 id="customers">Customers</h2>
+        <article>
+            <p>
+                This task manager has a place where your customers can view the work progress of their project.<br />
+                <h4>When a user in role customer logs in, he will see :</h4>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        The projects page with the project that this customer has been attached
+                    </li>
+                    <li class="list-group-item">
+                        Can view the description of its project.<br /> <em>Note: The project description is in WYSWYG control , so you can set even some project rules in here.</em>
+                    </li>
+                    <li class="list-group-item">
+                        For each of its projects customer can see the tasks, in Kanban board just like the other users see.
+                    </li>
+                </ul>
+            </p>
+            <p>
+                <h4> What a customer can't do is:</h4>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        Change data about any project
+                    </li>
+                    <li class="list-group-item">
+                        View a project that does not belong to him
+                    </li>
+                    <li class="list-group-item">
+                        Change task progress in Kanban board.
+                    </li>
+                    <li class="list-group-item">
+                        View task description. <br />
+                        <em>Why? Because the task description is for the developers, there is techical details in there that can gave some headace to him :) </em>
+                    </li>
+                </ul>
+                Creating a user for your customer is like creating any other user, just attach them in a specific Customer.<br />
+                <em>This will be treated in users and roles section.</em>
+            </p>
+        </article>
+        <hr>
+        <h2 id="security">Users and Roles</h2>
+        <article>
+            <p>
+                This task manager works as a role-based application, there are several predefined roles that access different parts of te app
+                and do specific actions.<br />
+                <em>admin</em> is by default the role on which any user attached can do everything, without any restriction.<br />
+                Based on the <samp>configuration</samp> on <samp>application_start</samp> there will be a user attached to this role, from where you can configure the app
+                to met your office requirenments. A user that belongs to the "admin", from the navbar under <b>Security</b> dropdown can access the panel
+                to manage the roles and users. <br />
+                All roles supported across the application are created at application start. Their names and description are ass folows,
+                <table class="table table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Role Name</th>
+                            <th>Role Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>admin</td>
+                            <td>"The man"!</td>
+                        </tr>
+                        <tr>
+                            <td>projectCRUD
+                            <td>Any user attached on this role can Create,Update and Delete any project</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                taskCRUD
+                            </td>
+                            <td>
+                                Create,Update and Delete any task that <em>can see</em>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>taskAddFiles
+                            <td>Can add files to any task that <em>can see</em></td>
+                        </tr>
+                        <tr>
+                            <td>taskDeleteFiles
+                            <td>Can delete the files attached to any task that this user can access</td>
+                        </tr>
+                        <tr>
+                            <td>taskAttachUser</td>
+                            <td>Attach users to any task that this user can access</td>
+                        </tr>
+                        <tr>
+                            <td>customer</td>
+                            <td>Special type of user that can access the project list, and see all the projects that belongs to the customer that the user is attached and view the task board with all the tasks that belong to his projects. <em>Note that a customer can't run any action on the tasks.</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </p>
+            <p>
+                Note that in the upper table there are used some phrases like <em>can see</em> and <em>can access</em> , and in the navigation menu there is not a
+                <strong>Team</strong> section!
+                But there is no reason to worry.<br />
+                The <em>Team option</em> is implemented like this:
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        Any user logged under a role different from <samp>admin/customer</samp> will see just the
+                        projects on which has at least one task assigned to him
+                    </li>
+                    <li class="list-group-item">Any user logged under a role different from <samp>admin/customer</samp> can see just the tasks that belong to projects on which he/she has at least one task assigned to him</li>
+                </ul>
+                By following this rule , to create <em>a Team</em> that works on <em>Project A</em> we attach at least one task from this project to all users we want to include in this team.
+                <br />If there is a <em>Project B</em> and these users does not have any task from that project assigned to them, they will not see it.<br />
+                From this logic we have the benefits like we save some headache from another panel that would be used to attach user to a team, create another team, manage current teams, share users between them etc.
+            </p>
+        </article>
+        <hr>
+        <h2 id="tasks">Tasks</h2>
+        <article>
+            <p>
+                After you have Categories and kanban columns you can create tasks on your project.<br />
+                On task creation view there are default values selected for categories and mode, so the <em>task name</em> is the only required field, anyway
+                there are several aditional fields that you can fill for a task like
+                <ul class="list-group">
+                    <li class="list-unstyled">Description</li>
+                    <li class="list-unstyled">Parent Task</li>
+                    <li class="list-unstyled">Due Date</li>
+                    <li class="list-unstyled">Priority</li>
+                    <li class="list-unstyled">Start Date</li>
+                    <li class="list-unstyled">Time Estimated</li>
+                    <li class="list-unstyled">Mark <em>determines the column in board</em></li>
+                    <li class="list-unstyled">Category</li>
+                </ul>
+            </p>
+            <div>
+                <p>There are two options for displaying tasks <em>Kanban Board</em> and <em>List</em>.</p>
+                <div class="row">
+                    <div class="col-md-12">
+                        <img class="img-responsive" src="~/Content/image/List.png" alt="Task List" title="Task List" />
+                    </div>
+                </div>
+                <p>
+                    In both list and board you can filter tasks based in <em>Task Category,User Assigned and Due Date</em>,however in list mode thanks to the
+                    datatable.js there are options like order list, search and paginate.<br />
+                    Other actions like <em>edit,dublicate,assign users, add files and delete </em> for a task can be found under details,that is after click in task name.
+                    <br />
+                </p>
+            </div>
+        </article>
+        <hr />
+        <h2 id="chat">Live chat</h2>
+        <article>
+            <p>
+                In this task manager there is a section where users can comunicate with each other in real time. If the user opens the website it will appear
+                online to other users and will see users that are online as well.<br />
+                This is implemented using the awesome <a href="http://www.asp.net/signalr">SignalR</a><br />
+                In the right side of page is the panel of users. All users will be appeared here and not just the <em>team</em> members.
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="~/Content/image/chat.png" class="img-responsive" title="Chat page" />
+                </div>
+                <div class="col-md-6">
+                    <p>
+                        If the chat page is not in focus the user will be noticed by a web notification and a beep sound in case a message arrives. The conversation
+                        is one by one and the messages are saved.
+                        <em>Note that the sent message will be saved even when a user is not online, and will be retrieved when it selects the sender in users panel.</em>
+                    </p>
+                </div>
+            </div>
+        </article>
+        <hr />
+        <h2 id="statistics">Statistics</h2>
+        <article>
+            The statistics are available for admin role. If you are logged in as an admin then you can vist this page from the nav-bar, under <em>Admin</em> drop
+            click the <em>Statisics</em> item. The graphs are from google charts. The statistics that we support by now are as follows
+            <p>
+                <h4>Tasks per User</h4>
+                In this page is displayed the number of tasks in total for each user. This is done by using a standart horizontal bar chart.
+            </p>
+            <p>
+                <h4>Task Mode per User</h4>
+                This page contains a material bar chart that for each user shows the number of tasks in each board column. <em>for instance 5 ready, 3 in progres etc..</em>
+            </p>
+            <p>
+                <h4>Task Category per User</h4>
+                Shows the number of tasks grupped by categories that are assigned to each user. <em>example : John Smith 3 Bugs,17 Feauures etc...</em>
+            </p>
+            <p>
+                <h4>Task Movements</h4>
+                This page has no charts, instead it shows the latest task movements between board columns ordered by time that they are moved.
+                <em>For example : John moved task "Create Documentation" from work in progress to done at 10:00 AM</em>. By default there are shown the last 50 movemets,the user can click in <em>show more</em> and view as many as he wants to.
+            </p>
+        </article>
+        <hr />
+
+        <h2>Licence</h2>
+        <article>
+            <a href="~/LICENSE.TXT" target="_blank">   Board-Time Copyright (C) 2016  Ermir Beqiraj</a><br />
+
+            This program is free software: you can redistribute it and/or modify
+            it under the terms of the GNU General Public License as published by
+            the Free Software Foundation, either version 3 of the License, or
+            (at your option) any later version.
+
+            This program is distributed in the hope that it will be useful,
+            but WITHOUT ANY WARRANTY; without even the implied warranty of
+            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+            GNU General Public License for more details.
+
+            You should have received a copy of the GNU General Public License
+            along with this program.  If not, see <a href="http://www.gnu.org/licenses/" target="_blank"> http://www.gnu.org/licenses/ </a>
+        </article>
+        <hr />
+        <h2 id="contact"> Contact</h2>
+        <article>
+            <p>
+                If you have any questions,concerns or want to provide some feedback,you can contact me anytime at
+                <a href="mailto:ermirbeqiraj@hotmail.com">Ermir Beqiraj</a>.
+            </p>
+        </article>
+
+    </div>
+</div>
+
+@section scripts{
+    
+<script>
+    $(function () {
+       
+        $('#sidebar').affix({
+            offset: {
+                top: 250
+            }
+        });
+
+        var $body = $(document.body);
+        var navHeight = $('.navbar').outerHeight(true) + 10;
+
+        $body.scrollspy({
+            target: '#leftCol',
+            offset: navHeight
+        });
+    });
+    
+</script>
+}
+

@@ -1,0 +1,44 @@
+﻿@model IEnumerable<MvcToDo.Models.TaskCategory>
+
+@{
+    ViewBag.Title = "Task Categories";
+}
+
+<div class="jumbotron">
+    <header>
+        <h2>Task Categories</h2>
+        "Categores" are used to mark a task in a specific category. You can attach a class from bootstrap labels to a category and then every
+        task in a specific category will be marked with a span containing category caption in the specified class.
+    </header>
+</div>
+<p>
+    <span class="glyphicon glyphicon-plus"></span>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Caption)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Color)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Caption)
+        </td>
+        <td>
+            <span class="@item.Color">@item.Caption</span>
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

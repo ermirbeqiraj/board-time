@@ -1,0 +1,41 @@
+﻿@model List<MvcToDo.ModelsView.SimpleList>
+
+@{
+    ViewBag.Title = "Projects";
+}
+<style>h3{font-family:"Open Sans","Segoe UI",Frutiger,"Frutiger Linotype","Dejavu Sans","Helvetica Neue",Arial,sans-serif;line-height:1.5em;font-weight:400}.tile{width:100%;display:inline-block;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box;background:#fff;padding:10px;margin-bottom:30px}.tile.blue{background:#26a9ec;color:#fff}.tile.blue:hover{background:#125acd}p,span,button{font-family:"Open Sans","Segoe UI",Frutiger,"Frutiger Linotype","Dejavu Sans","Helvetica Neue",Arial,sans-serif;font-size:14px;line-height:1.5em;font-weight:400}.mainLinks{color:#fff;text-decoration:none}.mainLinks:hover{color:#fff;text-decoration:none}.smallLinks{color:#fff;text-decoration:none}.smallLinks:hover{color:#fff;text-decoration:none}</style>
+
+<h2>Projects</h2>
+@if (User.IsInRole("projectCRUD") || User.IsInRole("admin"))
+{
+    <p>
+        <span class="glyphicon glyphicon-plus"></span>
+        @Html.ActionLink("Create New", "Create")
+    </p>
+}
+<hr />
+<div>
+    <div class="form-group">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="tile blue">
+                    <a class="mainLinks" href="@Url.Action("Board", "TaskItems", new { projectId = item.Id })">
+                        <h3 class="title">
+                            @item.Name
+                        </h3>
+                    </a>
+                    <div class="pull-right">
+                        <div class="btn-group" role="group" aria-label="...">
+                            <a class="smallLinks" href="@Url.Action("Details", new { Id = item.Id })">Details</a> &nbsp;
+                            @Html.Partial("_ProjectAction", item.Id)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        &nbsp;
+    </div>
+</div>

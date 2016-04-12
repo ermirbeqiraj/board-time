@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "Tasks Mode per User";
+}
+<div class="jumbotron">
+    <h2>Tasks per user</h2>
+    <p>
+        In this chart are shown the number of tasks in each board column for all users that have a task.
+    </p>
+</div>
+<p>
+    <span class="glyphicon glyphicon-arrow-left"></span>
+    @Html.ActionLink("Back to Statistics", "Statistics")
+</p>
+<div id="loading" class="row">
+    <div class="col-md-2 col-md-offset-5">
+        <img alt="Getting db data ..." src="~/Content/image/ajax-loader.gif" class="img-circle" />
+        <ul id="loadingError"></ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group">
+            <div id="chart_div"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="~/Scripts/JSLINQ.js"></script>
+    <script>
+
+        $(document).ajaxStart(function () {
+            $("#loading").show();
+        })
+        .ajaxComplete(function () {
+            $("#loading").hide();
+        })
+        .ajaxError(function (event,request,settings) {
+            $("#loadingError").append("<li>Error requesting page " + settings.url + "</li>");
+        });
+
+        google.charts.load('current',{ 'packages': ['bar'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            // this will return the main data
+            var url = "/Home/GetTaskModePerUser";
+            $.getJSON(url,null,function (chartData) {
+                var taskModeUrl = "/Home/GetTaskMode";
+                $.getJSON(taskModeUrl,null,function (data) {
+                    // 1. Take the board columns
+                    var boardColumns = data;
+                    // 2. Create that table like google likes in their charts
+                    var dbdata = new Array();
+                    dbdata.push(data);
+                    // ok , now we have a table of type : [["user","boardcol","boardcol",...]
+                    // 3. because the returned data can have many rows and this application type cant have that many users
+                    // its better to query back for getting all users, so:
+                    var allUsersUrl = "/Home/GetUsers";
+                    $.getJSON(allUsersUrl,null,function (usrs) {
+                        // if we are here we have a table of type : ["user","user",...]
+                        // 4. for each user
+                        for (var i = 0; i < usrs.length; i++) {
+                            var currentUser = usrs[i];
+                            var arrayItem = new Array();
+                            arrayItem.push(currentUser);
+                            // 4.1 for each column
+                            for (var j = 1 ; j < boardColumns.length; j++) {
+                                //4.2 select over table for this user and this column
+                                var currentColumn = boardColumns[j];
+
+                                var countUsrCol = JSLINQ(chartData)
+                                    .Where(function (item) { return item.User == currentUser; })
+                                    .Select(function (item) { return item; });
+
+                                var colFound = false;
+                                for (var k = 0 ; k < countUsrCol.items.length ; k++) {
+                                    if (countUsrCol.items[k].Mode == currentColumn) {
+                                        colFound = true;
+                                        arrayItem.push(parseInt(countUsrCol.items[k].Count));
+                                    }
+                                }
+
+                                if (!colFound) {
+                                    arrayItem.push(0.01);
+                                }
+                            }
+                            dbdata.push(arrayItem);
+                        }
+
+                        drawTaskChart(dbdata);
+                    });
+                });
+            });
+        }
+
+        function drawTaskChart(dbdata) {
+            var chartHeight = (dbdata.length * 100);
+            var data = google.visualization.arrayToDataTable(dbdata);
+
+            var options = {
+                chart: {
+                    title: 'Task Mode/ User',
+                    subtitle: 'Number of tasks for each user per board-column',
+                },
+                bars: 'horizontal',
+                hAxis: { format: 'decimal' },
+                height: chartHeight,
+                colors: ['#1b9e77','#d95f02','#0093D1','#F2635F','#F4D00C','#E0A025','#006495', '#004C70']
+            };
+
+            var chart = new google.charts.Bar(document.getElementById('chart_div'));
+            chart.draw(data,google.charts.Bar.convertOptions(options));
+        }
+
+    </script>
+}

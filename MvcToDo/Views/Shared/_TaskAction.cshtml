@@ -1,0 +1,53 @@
+﻿    @if (User.IsInRole("admin"))
+    {
+        <div class="btn-group" role="group">
+            @Html.ActionLink("Create Subtask", "Create", new { Parent= Model.Id } , new{ @class="btn btn-default" })
+         </div>
+        <div class="btn-group" role="group">
+            @Html.ActionLink("Dublicate", "Dublicate", new { id = Model.Id }, new{ @class="btn btn-default" })
+        </div>
+        <div class="btn-group" role="group">
+            @Html.ActionLink("Delete", "Delete", new { id = Model.Id }, new { @class = "btn btn-default" })
+        </div>
+        <div class="btn-group" role="group">
+            @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new{ @class="btn btn-default" })
+        </div>
+        <div class="btn-group" role="group">
+            @Html.ActionLink("Files", "Files", new { id = Model.Id }, new{ @class="btn btn-default" })
+            </div>
+        <div class="btn-group" role="group">
+            @Html.ActionLink("Users", "Users", new { id = Model.Id }, new { @class = "btn btn-default" })
+        </div>
+    }
+    else
+    {
+        if (User.IsInRole("taskCRUD"))
+        {
+            <div class="btn-group" role="group">
+                @Html.ActionLink("Create Subtask", "Create", new { Parent = Model.Id }, new { @class = "btn btn-default" })
+            </div>
+            <div class="btn-group" role="group">
+                @Html.ActionLink("Dublicate", "Dublicate", new { id = Model.Id }, new { @class = "btn btn-default" })
+            </div>
+            <div class="btn-group" role="group">
+                @Html.ActionLink("Edit", "Edit", new { id = Model.Id }, new { @class = "btn btn-default" })
+            </div>
+            <div class="btn-group" role="group">
+                @Html.ActionLink("Delete", "Delete", new { id = Model.Id }, new { @class = "btn btn-default" })
+            </div>
+        }
+
+        if (User.IsInRole("taskAddFiles") || User.IsInRole("taskDeleteFiles"))
+        {
+            <div class="btn-group" role="group">
+                @Html.ActionLink("Files", "Files", new { id = Model.Id }, new{ @class="btn btn-default" })
+            </div>
+        }
+
+        if (User.IsInRole("taskAttachUser"))
+        {
+            <div class="btn-group" role="group">
+                @Html.ActionLink("Users", "Users", new { id = Model.Id }, new { @class = "btn btn-default" })
+            </div>
+        }
+    }

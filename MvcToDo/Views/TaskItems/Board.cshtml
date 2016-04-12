@@ -1,0 +1,125 @@
+﻿@model MvcToDo.ModelsView.BoardView
+
+@{
+    ViewBag.Title = "Board";
+}
+@Styles.Render("~/Content/themes/base/css")
+<link href="~/Content/boardStyle.css" rel="stylesheet" />
+<p class="clearfix"></p>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="col-lg-4">
+            <div class="form-group">
+                @if (User.IsInRole("taskCRUD") || User.IsInRole("admin"))
+                {
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> @Html.ActionLink("Create New", "Create")@: &nbsp; &nbsp;
+                }
+                @if (!User.IsInRole("customer"))
+                {
+                    <span class="glyphicon glyphicon-list" aria-hidden="true"></span> @Html.ActionLink("List Mode", "Index")
+                }
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="form-group">
+                @if (!User.IsInRole("customer"))
+                {
+                    <div class="pull-right form-inline">
+                        @using (Html.BeginForm("Board", "TaskItems", FormMethod.Get))
+                        {
+                            @Html.DropDownList("CategoryId", Model.TCategories, "Filter Category", new { @class = "form-control" }) @:&nbsp;
+                            @Html.DropDownList("UserId", Model.TUsers, "Filter User", new { @class = "form-control" }) @:&nbsp;
+                            @Html.JQueryUI().Datepicker("DueDate", null, new { @class = "form-control", placeholder = "Due Date" }) @:&nbsp;
+                            <input type="submit" value="Filter" class="btn btn-default" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <p class="clearfix"></p>
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <table id="tblContent" class="table table-bordered table-striped"
+               style="margin-bottom:0; padding-bottom:10px;">
+            <thead>
+                <tr id="tableHeader">
+                    @foreach (var item in Model.BoardColumns)
+                    {
+                    <td class="col-md-2"><label> @item.Caption </label></td>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="rowForData">
+                    @foreach (var item in Model.BoardColumns)
+                    {
+                    <td style="padding:0;margin:0;">
+                        <div class="scrollable">
+                            <div class="boardCol" id="col_@item.Id">
+                                @{
+                        var items = Model.Board.Where(x => x.MarkId == item.Id).ToList();
+                        foreach (var task in items)
+                        {
+                                    <div class="portlet" id="item_@task.Id">
+                                        <div class="portlet-header"> # @Html.Encode(task.Id)</div>
+                                        <div class="portlet-content">&raquo; @Html.ActionLink(task.Name, "Details", new { id = task.Id }) </div>
+                                        <span class="pull-right @task.CssClass">@task.Category</span>
+                                    </div>
+                        }
+                                }
+                            </div>
+                        </div>
+                    </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/boardscript")
+<script>
+    $(function () {
+        $(window).resize(function () {
+            calcTaskTableHeight();
+        });
+        calcTaskTableHeight();
+    });
+
+    function calcTaskTableHeight() {
+        try {
+            /* show footer for calculation*/
+            $('footer').show();
+            /* distance from footer */
+            var footerTop = $('footer').offset().top;
+            /* distance from tbody */
+            var startPxOfRow = $('tbody').offset().top;
+            /* calc height of tbl-content */
+            var fixedHeightOfTd = footerTop - startPxOfRow;
+            /* set height to div that contains task-items */
+            $('.scrollable').height(fixedHeightOfTd);
+        } catch (e) {
+            console.error(e.description);
+        }
+    }
+
+</script>
+
+
+
+    @if (User.IsInRole("customer"))
+    {
+        <script>
+            /*
+            if user is customer he cant change status of a task,
+            of course this is checked in c# method but disabling sortable here seems comfort for enduser too
+            */
+            $(document).ready(function () {
+                $(function () {
+                    $('.boardCol').sortable("disable");
+                });
+            });
+        </script>
+    }
+}

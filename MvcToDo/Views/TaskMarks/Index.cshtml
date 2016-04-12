@@ -1,0 +1,37 @@
+﻿@model IEnumerable<MvcToDo.Models.TaskMark>
+
+@{
+    ViewBag.Title = "Index";
+}
+<div class="jumbotron">
+    <header>
+        <h2>Task Marks</h2>
+        "Task Mark" are steps that a task can be in a specific time. These items will be shown in "Task Board" section, represented as table columns.
+        Then user can drag a task from a state to an other <span class="text-muted">ex. from "Done" to "Tested"</span> 
+    </header>
+</div>
+<p>
+    <span class="glyphicon glyphicon-plus"></span>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Caption)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Caption)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,83 @@
+﻿
+@{
+    ViewBag.Title = "Tasks Per User";
+}
+<div class="jumbotron">
+    <h2>Tasks per user</h2>
+    <p>
+        In this chart are shown the number of tasks in total for each user.
+    </p>
+</div>
+<p>
+    <span class="glyphicon glyphicon-arrow-left"></span>
+    @Html.ActionLink("Back to Statistics", "Statistics")
+</p>
+<div id="loading" class="row">
+    <div class="col-md-2 col-md-offset-5">
+        <img alt="Getting db data ..." src="~/Content/image/ajax-loader.gif" class="img-circle" />
+        <ul id="loadingError"></ul>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group">
+            <div id="chart_div"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        $(document).ajaxStart(function () {
+            $("#loading").show();
+        })
+        .ajaxComplete(function () {
+            $("#loading").hide();
+        })
+        .ajaxError(function (event,request,settings) {
+            $("#loadingError").append("<li>Error requesting page " + settings.url + "</li>");
+        });
+
+        google.charts.load('current',{ packages: ['corechart','bar'] });
+        google.charts.setOnLoadCallback(createChart);
+
+        var resizeTm;
+        $(window).resize(function () {
+            clearTimeout(resizeTm);
+            resizeTm = setTimeout(createChart,500);
+        });
+
+        function createChart() {
+            var dbdata = [['Users','Number of tasks assigned']];
+            var url = "/Home/GetTasksPerUser";
+            $.getJSON(url,null,function (data) {
+                $.each(data,function (i,item) {
+                    dbdata.push([item.User,item.Count]);
+
+                    var data = google.visualization.arrayToDataTable(dbdata);
+
+                    var options = {
+                        title: 'Distribution of tasks for user',
+                        chartArea: { width: '65%',height: (dbdata.length * 50) },
+                        hAxis: {
+                            title: 'Task Count',
+                            minValue: 0
+                        },
+                        vAxis: {
+                            title: 'Users'
+                        },
+                        legend: { position: "none" },
+                        animation: {
+                            duration: 1000,
+                            startup:true
+                        }
+                    };
+
+                    var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+                    chart.draw(data,options);
+                });
+            });
+        }
+    </script>
+}

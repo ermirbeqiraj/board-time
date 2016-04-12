@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "Statistics";
+}
+
+<div class="jumbotron">
+    <h2>Statistics</h2>
+    <p>
+        Use this page to view different statistics about users and tasks
+    </p>
+</div>
+
+<div class="col-sm-12 col-md-12 col-lg-12">
+    <div>
+        <div class="col-sm-6 col-md-3">
+            <div class="form-group">
+                <a href="@Url.Action("TasksPerUser")">
+                    <img src="~/Content/image/col.png" class="img-rounded center-block" />
+                    <p>
+                        <h4 class="text-center text-primary"> Tasks/User </h4>
+                    </p>
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="form-group">
+                <a href="@Url.Action("TaskModePerUser")">
+                    <img src="~/Content/image/bar.png" class="img-rounded center-block" />
+                    <p>
+                        <h4 class="text-center text-primary"> Tasks-Mode/User </h4>
+                    </p>
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="form-group">
+                <a href="@Url.Action("TaskCategoryPerUser")">
+                    <img src="~/Content/image/pie.png" class="img-rounded center-block" />
+                    <p>
+                        <h4 class="text-center text-primary"> Tasks-Categories/User </h4>
+                    </p>
+                </a>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="form-group">
+                <a href="@Url.Action("TaskMovements")">
+                    <img src="~/Content/image/time.png" class="img-rounded center-block" />
+                    <p>
+                        <h4 class="text-center text-primary"> Task Movements </h4>
+                    </p>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
