@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
-
-namespace MvcToDo.Models
+namespace DbModel
 {
-    [Table("CustomerUser")]
-    public class CustomerUser
-    {
-        public CustomerUser()
-        {
-            
-        }
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity.Spatial;
 
+    [Table("CustomerUser")]
+    public partial class CustomerUser
+    {
         public int Id { get; set; }
 
         public int CustomerId { get; set; }
@@ -26,6 +20,5 @@ namespace MvcToDo.Models
         public bool Active { get; set; }
 
         public virtual Customer Customer { get; set; }
-
     }
 }

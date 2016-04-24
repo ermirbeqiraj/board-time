@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
-
-namespace MvcToDo.Models
+namespace DbModel
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity.Spatial;
+
     [Table("TaskLifecycle")]
     public partial class TaskLifecycle
     {
@@ -24,7 +23,6 @@ namespace MvcToDo.Models
 
         [Column(TypeName = "smalldatetime")]
         public DateTime Created { get; set; }
-
 
         public virtual TaskItem TaskItem { get; set; }
 

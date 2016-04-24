@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using DbModel;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using MvcToDo.Models;
 using MvcToDo.ModelsView;
-using Microsoft.AspNet.Identity.Owin;
+using MvcToDo.Persistence;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Web;
+using System.Web.Mvc;
 
 namespace MvcToDo.Controllers
 {
@@ -28,6 +29,12 @@ namespace MvcToDo.Controllers
             {
                 _userManager = value;
             }
+        }
+
+        UnitOfWork _repo;
+        public UsersController()
+        {
+            _repo = new UnitOfWork(new ModelContext());
         }
 
         // GET: Users
@@ -59,7 +66,7 @@ namespace MvcToDo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Email,Password,ConfirmPassword,LastName,FirstName")] InsertUser currentUser, string[] Roles)
         {
-            var user = new ApplicationUser { Email = currentUser.Email, UserName = currentUser.Email , FirstName = currentUser.FirstName , LastName = currentUser.LastName };
+            var user = new ApplicationUser { Email = currentUser.Email, UserName = currentUser.Email, FirstName = currentUser.FirstName, LastName = currentUser.LastName };
             var result = UserManager.Create(user, currentUser.Password);
             if (result.Succeeded)
             {
@@ -83,16 +90,15 @@ namespace MvcToDo.Controllers
         public ActionResult Edit(string Id)
         {
             var item = GetEditUser(Id);
-            ModelContext db = new ModelContext();
-            var customers = db.Customer.Where(x => x.Active == true).Select(x => new { x.Id, x.Name }).ToList();
-            int? companyId = db.CustomerUser.Where(x => x.UserId == Id).Select(x => x.CustomerId).FirstOrDefault();
+            var customers = _repo.Customer.Find(x => x.Active == true).Select(x => new { x.Id, x.Name }).ToList();
+            int? companyId = _repo.CustomerUser.Find(x => x.UserId == Id).Select(x => x.CustomerId).FirstOrDefault();
             ViewBag.Customer = new SelectList(customers, "Id", "Name", companyId.HasValue ? companyId.Value : -1);
             return View(item);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Email,FirstName,LastName")] EditUser modelUser, string[] Roles,bool chkIsCustomer, int? CustomerId)
+        public ActionResult Edit([Bind(Include = "Id,Email,FirstName,LastName")] EditUser modelUser, string[] Roles, bool chkIsCustomer, int? CustomerId)
         {
             if (ModelState.IsValid)
             {
@@ -114,14 +120,14 @@ namespace MvcToDo.Controllers
                         return View(modelUser);
                     }
 
-                    var claims = UserManager.GetClaims(dbUser.Id).Where( c => c.Type == "MvcToDo:UserFullName").ToList();
-                    foreach(var item in claims)
+                    var claims = UserManager.GetClaims(dbUser.Id).Where(c => c.Type == "MvcToDo:UserFullName").ToList();
+                    foreach (var item in claims)
                     {
                         UserManager.RemoveClaim(dbUser.Id, item);
                     }
 
                     UserManager.AddClaim(dbUser.Id, new Claim("MvcToDo:UserFullName", dbUser.FirstName + " " + dbUser.LastName));
-                    
+
 
                     // get our roles
                     if (Roles != null)
@@ -131,22 +137,18 @@ namespace MvcToDo.Controllers
                     }
 
                     // get all rows where this user is customer
-                    using (ModelContext db = new ModelContext())
+
+                    var customerUser = _repo.CustomerUser.Find(x => x.UserId == modelUser.Id).ToList();
+                    _repo.CustomerUser.RemoveRange(customerUser);
+
+                    if (chkIsCustomer && CustomerId.HasValue)
                     {
-                        var customerUser = db.CustomerUser.Where(x => x.UserId == modelUser.Id).ToList();
-                        foreach (var item in customerUser)
-                        {
-                            db.CustomerUser.Remove(item);
-                            db.SaveChanges();
-                        }
-                        if (chkIsCustomer && CustomerId.HasValue)
-                        {
-                            CustomerUser cu = new CustomerUser { UserId = modelUser.Id, CustomerId = CustomerId.Value, Active = true };
-                            db.CustomerUser.Add(cu);
-                            db.SaveChanges();
-                            UserManager.AddToRole(dbUser.Id, "customer");
-                        }
+                        CustomerUser cu = new CustomerUser { UserId = modelUser.Id, CustomerId = CustomerId.Value, Active = true };
+                        _repo.CustomerUser.Add(cu);
+                        _repo.Persist();
+                        UserManager.AddToRole(dbUser.Id, "customer");
                     }
+
 
                     return RedirectToAction("Index");
                 }

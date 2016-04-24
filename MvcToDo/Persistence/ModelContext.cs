@@ -1,13 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
-
-namespace MvcToDo.Models
+using System.Linq;
+using System.Web;
+using DbModel;
+namespace MvcToDo.Persistence
 {
-
-    public partial class ModelContext : DbContext
+    public class ModelContext : DbContext
     {
         public ModelContext()
             : base("name=ModelContext")
         {
+            Configuration.LazyLoadingEnabled = false;
             //Database.SetInitializer<ModelContext>(new DropCreateDatabaseIfModelChanges<ModelContext>());
             Database.SetInitializer<ModelContext>(new CreateDatabaseIfNotExists<ModelContext>());
             //Database.SetInitializer<ModelContext>(null);

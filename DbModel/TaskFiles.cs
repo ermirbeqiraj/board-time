@@ -1,4 +1,4 @@
-namespace MvcToDo.Models
+namespace DbModel
 {
     using System;
     using System.Collections.Generic;

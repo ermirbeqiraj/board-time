@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcToDo", "MvcToDo\MvcToDo.csproj", "{D3811701-7BFE-4DA4-A801-16B8CDE2BEAD}"
 EndProject
@@ -12,16 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8BD407
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbModel", "DbModel\DbModel.csproj", "{DEF67B55-863C-4D17-89EC-82A61741DB93}"
+EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://ermirbeqiraj.visualstudio.com/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = MvcToDo\\MvcToDo.csproj
-		SccProjectName1 = MvcToDo
-		SccLocalPath1 = MvcToDo
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -31,6 +24,10 @@ Global
 		{D3811701-7BFE-4DA4-A801-16B8CDE2BEAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3811701-7BFE-4DA4-A801-16B8CDE2BEAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3811701-7BFE-4DA4-A801-16B8CDE2BEAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEF67B55-863C-4D17-89EC-82A61741DB93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEF67B55-863C-4D17-89EC-82A61741DB93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEF67B55-863C-4D17-89EC-82A61741DB93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEF67B55-863C-4D17-89EC-82A61741DB93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

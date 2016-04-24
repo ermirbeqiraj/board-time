@@ -1,27 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Web.Mvc;
+﻿using DbModel;
 using MvcToDo.App_Code;
-using MvcToDo.Models;
+using MvcToDo.Persistence;
+using System.Net;
+using System.Web.Mvc;
 
 namespace MvcToDo.Controllers
 {
     [Authorize(Roles = "admin")]
     public class TaskCategoriesController : Controller
     {
-        private ModelContext db = new ModelContext();
-        Helpers _helper = new Helpers();
+        UnitOfWork _repo;
+        Helpers _helper;
+        public TaskCategoriesController()
+        {
+            _repo = new UnitOfWork(new ModelContext());
+            _helper = new Helpers();
+        }
 
         // GET: TaskCategories
         public ActionResult Index()
         {
-            var items = (from x in db.TaskCategory
-                         select x).ToList();
+            var items = _repo.TaskCategory.GetAll();
             return View(items);
         }
 
@@ -41,8 +40,8 @@ namespace MvcToDo.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.TaskCategory.Add(taskCategory);
-                db.SaveChanges();
+                _repo.TaskCategory.Add(taskCategory);
+                _repo.Persist();
                 return RedirectToAction("Index");
             }
             return View(taskCategory);
@@ -55,7 +54,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            TaskCategory taskCategory = db.TaskCategory.Find(id);
+            TaskCategory taskCategory = _repo.TaskCategory.Get(id.Value);
             if (taskCategory == null)
             {
                 return HttpNotFound();
@@ -73,8 +72,8 @@ namespace MvcToDo.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(taskCategory).State = EntityState.Modified;
-                db.SaveChanges();
+                _repo.TaskCategory.Update(taskCategory);
+                _repo.Persist();
                 return RedirectToAction("Index");
             }
             return View(taskCategory);
@@ -87,7 +86,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            TaskCategory taskCategory = db.TaskCategory.Find(id);
+            TaskCategory taskCategory = _repo.TaskCategory.Get(id.Value);
             if (taskCategory == null)
             {
                 return HttpNotFound();
@@ -100,9 +99,9 @@ namespace MvcToDo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            TaskCategory taskCategory = db.TaskCategory.Find(id);
-            db.TaskCategory.Remove(taskCategory);
-            db.SaveChanges();
+            TaskCategory taskCategory = _repo.TaskCategory.Get(id);
+            _repo.TaskCategory.Remove(taskCategory);
+            _repo.Persist();
             return RedirectToAction("Index");
         }
 
@@ -110,7 +109,7 @@ namespace MvcToDo.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _repo.Dispose();
             }
             base.Dispose(disposing);
         }

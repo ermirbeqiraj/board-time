@@ -1,4 +1,4 @@
-namespace MvcToDo.Models
+namespace DbModel
 {
     using System;
     using System.Collections.Generic;
@@ -30,11 +30,11 @@ namespace MvcToDo.Models
 
         public bool Active { get; set; }
 
-        [Display(Name="Customer")]
         public int? CustomerId { get; set; }
 
         public virtual Customer Customer { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskItem> TaskItem { get; set; }
     }
 }

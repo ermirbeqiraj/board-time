@@ -1,4 +1,4 @@
-namespace MvcToDo.Models
+namespace DbModel
 {
     using System;
     using System.Collections.Generic;
@@ -13,9 +13,11 @@ namespace MvcToDo.Models
         public TaskMark()
         {
             TaskItem = new HashSet<TaskItem>();
+            TaskLifecycle = new HashSet<TaskLifecycle>();
+            TaskLifecycle1 = new HashSet<TaskLifecycle>();
         }
 
-        [DatabaseGenerated(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public byte Id { get; set; }
 
         [Required]
@@ -24,6 +26,7 @@ namespace MvcToDo.Models
 
         public bool Active { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskItem> TaskItem { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -31,6 +34,5 @@ namespace MvcToDo.Models
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskLifecycle> TaskLifecycle1 { get; set; }
-
     }
 }

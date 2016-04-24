@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.Migrations;
+﻿using DbModel;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using MvcToDo.Persistence;
+using System;
+using System.Collections.Generic;
 
 namespace MvcToDo.Models
 {
-    public class Initializer
+    public class Initializer : IDisposable
     {
+        UnitOfWork _repo;
+        public Initializer()
+        {
+            _repo = new UnitOfWork(new ModelContext());
+        }
+
         /// <summary>
         /// Manage task marks, this is supposed to be called in 
         /// every application start, to create TaskMarks ( Work in progress, done, tested etc ) or TaskCategories if not pressent
@@ -21,9 +28,8 @@ namespace MvcToDo.Models
                 var config = System.Configuration.ConfigurationManager.AppSettings["createDefaultTaskMarkCat"] ?? string.Empty;
                 if (!string.IsNullOrEmpty(config) && config.Equals("true"))
                 {
-                    using (ModelContext context = new ModelContext())
-                    {
-                        var _taskMark = new List<TaskMark>
+
+                    var _taskMark = new List<TaskMark>
                     {
                         new TaskMark{ Id = 1 , Caption = "Backlog" , Active = true},
                         new TaskMark{ Id = 2 , Caption = "Ready", Active = true},
@@ -31,20 +37,29 @@ namespace MvcToDo.Models
                         new TaskMark{ Id = 4 , Caption = "Done", Active = true},
                         new TaskMark{ Id = 5 , Caption = "Tested", Active = true}
                     };
+                    foreach (var item in _taskMark)
+                    {
+                        if (_repo.TaskMark.Get(item.Id) == null)
+                        {
+                            _repo.TaskMark.Add(item);
+                            _repo.Persist();
+                        }
+                    }
 
-                        _taskMark.ForEach(t => context.TaskMark.AddOrUpdate(_taskMark.ToArray()));
-                        context.SaveChanges();
-
-                        var _taskCategories = new List<TaskCategory>
+                    var _taskCategories = new List<TaskCategory>
                         {
                         new TaskCategory { Id = 1 , Caption = "Feature" , Color = "label label-success" },
                         new TaskCategory { Id = 2 , Caption = "Bug" , Color = "label label-danger" }
                         };
-
-                        _taskCategories.ForEach(t => context.TaskCategory.AddOrUpdate(_taskCategories.ToArray()));
-                        context.SaveChanges();
-
+                    foreach (var item in _taskCategories)
+                    {
+                        if (_repo.TaskCategory.Get(item.Id) == null)
+                        {
+                            _repo.TaskCategory.Add(item);
+                            _repo.Persist();
+                        }
                     }
+
                 }
                 _success = true;
             }
@@ -114,6 +129,11 @@ namespace MvcToDo.Models
                 // no error handling in weekend
             }
             return _success;
+        }
+
+        public void Dispose()
+        {
+            _repo.Dispose();
         }
     }
 }

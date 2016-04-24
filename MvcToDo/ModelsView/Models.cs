@@ -65,7 +65,7 @@ namespace MvcToDo.ModelsView
     public class BoardView
     {
         public List<TaskBoard> Board { get; set; }
-        public List<TaskMark> BoardColumns { get; set; }
+        public List<DbModel.TaskMark> BoardColumns { get; set; }
         public System.Web.Mvc.SelectList TCategories { get; set; }
         public System.Web.Mvc.SelectList TUsers { get; set; }
     }

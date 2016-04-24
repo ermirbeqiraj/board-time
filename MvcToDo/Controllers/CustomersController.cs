@@ -1,24 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using MvcToDo.Models;
+using MvcToDo.Persistence;
+using DbModel;
 
 namespace MvcToDo.Controllers
 {
     [Authorize(Roles = "admin")]
     public class CustomersController : Controller
     {
-        private ModelContext db = new ModelContext();
-
+        UnitOfWork _repo;
+        public CustomersController()
+        {
+            _repo = new UnitOfWork(new Persistence.ModelContext());
+        }
+        
         // GET: Customers
         public ActionResult Index()
         {
-            return View(db.Customer.Where(x => x.Active).ToList());
+            return View(_repo.Customer.Find(x => x.Active).ToList());
         }
 
         // GET: Customers/Details/5
@@ -28,7 +30,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Customer customer = db.Customer.Find(id);
+            Customer customer = _repo.Customer.Get(id.Value);
             if (customer == null)
             {
                 return HttpNotFound();
@@ -53,8 +55,8 @@ namespace MvcToDo.Controllers
             
             if (ModelState.IsValid)
             {
-                db.Customer.Add(customer);
-                db.SaveChanges();
+                _repo.Customer.Add(customer);
+                _repo.Persist();
                 return RedirectToAction("Index");
             }
 
@@ -68,7 +70,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Customer customer = db.Customer.Find(id);
+            Customer customer = _repo.Customer.Get(id.Value);
             if (customer == null)
             {
                 return HttpNotFound();
@@ -85,8 +87,9 @@ namespace MvcToDo.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(customer).State = EntityState.Modified;
-                db.SaveChanges();
+                customer.Active = true;
+                _repo.Customer.Update(customer);
+                _repo.Persist();
                 return RedirectToAction("Index");
             }
             return View(customer);
@@ -99,7 +102,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Customer customer = db.Customer.Find(id);
+            Customer customer = _repo.Customer.Get(id.Value);
             if (customer == null)
             {
                 return HttpNotFound();
@@ -112,10 +115,10 @@ namespace MvcToDo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Customer customer = db.Customer.Find(id);
+            Customer customer = _repo.Customer.Get(id);
             customer.Active = false;
-            db.Entry(customer).State = EntityState.Modified;
-            db.SaveChanges();
+            _repo.Customer.Update(customer);
+            _repo.Persist();
             return RedirectToAction("Index");
         }
 
@@ -123,7 +126,7 @@ namespace MvcToDo.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _repo.Dispose();
             }
             base.Dispose(disposing);
         }

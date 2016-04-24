@@ -196,6 +196,21 @@
     <Compile Include="Controllers\TaskItemsController.cs" />
     <Compile Include="Controllers\TaskMarksController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
+    <Compile Include="Core\IUnitOfWork.cs" />
+    <Compile Include="Core\Repository\IChatRepository.cs" />
+    <Compile Include="Core\Repository\ICommentsRepository.cs" />
+    <Compile Include="Core\Repository\IConversationRepository.cs" />
+    <Compile Include="Core\Repository\ICustomerRepository.cs" />
+    <Compile Include="Core\Repository\ICustomerUserRepository.cs" />
+    <Compile Include="Core\Repository\IFilesRepository.cs" />
+    <Compile Include="Core\Repository\IProjectRepository.cs" />
+    <Compile Include="Core\Repository\IRepository.cs" />
+    <Compile Include="Core\Repository\ITaskAssignedRepository.cs" />
+    <Compile Include="Core\Repository\ITaskCategoryRepository.cs" />
+    <Compile Include="Core\Repository\ITaskFilesRepository.cs" />
+    <Compile Include="Core\Repository\ITaskItemRepository.cs" />
+    <Compile Include="Core\Repository\ITaskLifecycleRepository.cs" />
+    <Compile Include="Core\Repository\ITaskMarkRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -207,23 +222,25 @@
     <Compile Include="ModelsView\TaskItemViewWithComments.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationRole.cs" />
-    <Compile Include="Models\Chat.cs" />
-    <Compile Include="Models\Comments.cs" />
-    <Compile Include="Models\Conversation.cs" />
-    <Compile Include="Models\Customer.cs" />
-    <Compile Include="Models\CustomerUser.cs" />
-    <Compile Include="Models\Files.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Initializer.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
-    <Compile Include="Models\ModelContext.cs" />
-    <Compile Include="Models\Project.cs" />
-    <Compile Include="Models\TaskAssigned.cs" />
-    <Compile Include="Models\TaskCategory.cs" />
-    <Compile Include="Models\TaskFiles.cs" />
-    <Compile Include="Models\TaskItem.cs" />
-    <Compile Include="Models\TaskLifecycle.cs" />
-    <Compile Include="Models\TaskMark.cs" />
+    <Compile Include="Persistence\ModelContext.cs" />
+    <Compile Include="Persistence\Repository\ChatRepository.cs" />
+    <Compile Include="Persistence\Repository\CommentsRepository.cs" />
+    <Compile Include="Persistence\Repository\ConversationRepository.cs" />
+    <Compile Include="Persistence\Repository\CustomerRepository.cs" />
+    <Compile Include="Persistence\Repository\CustomerUserRepository.cs" />
+    <Compile Include="Persistence\Repository\FilesRepository.cs" />
+    <Compile Include="Persistence\Repository\ProjectRepository.cs" />
+    <Compile Include="Persistence\Repository\Repository.cs" />
+    <Compile Include="Persistence\Repository\TaskAssignedRepository.cs" />
+    <Compile Include="Persistence\Repository\TaskCategoryRepository.cs" />
+    <Compile Include="Persistence\Repository\TaskFilesRepository.cs" />
+    <Compile Include="Persistence\Repository\TaskItemRepository.cs" />
+    <Compile Include="Persistence\Repository\TaskLifecycleRepository.cs" />
+    <Compile Include="Persistence\Repository\TaskMarkRepository.cs" />
+    <Compile Include="Persistence\UnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -686,6 +703,12 @@
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DbModel\DbModel.csproj">
+      <Project>{def67b55-863c-4d17-89ec-82a61741db93}</Project>
+      <Name>DbModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

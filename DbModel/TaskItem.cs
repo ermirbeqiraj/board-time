@@ -1,4 +1,4 @@
-namespace MvcToDo.Models
+namespace DbModel
 {
     using System;
     using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace MvcToDo.Models
             Comments = new HashSet<Comments>();
             TaskAssigned = new HashSet<TaskAssigned>();
             TaskFiles = new HashSet<TaskFiles>();
+            TaskLifecycle = new HashSet<TaskLifecycle>();
         }
 
         public int Id { get; set; }
@@ -26,26 +27,18 @@ namespace MvcToDo.Models
         [StringLength(4000)]
         public string Description { get; set; }
 
-        [Display(Name="Parent")]
         public int? ParentId { get; set; }
 
-        [Display(Name="Project")]
         public int ProjectId { get; set; }
 
         [Column(TypeName = "date")]
-        //[DisplayFormat(DataFormatString = "{0:dd-MM-yy}", ApplyFormatInEditMode = true)]
-        [Display(Name="Due Date")]
         public DateTime? DueDate { get; set; }
 
         public byte Priority { get; set; }
 
         [Column(TypeName = "smalldatetime")]
-        [Display(Name="Start Date")]
-        [DataType(DataType.Date)]
-        //[DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? StartDate { get; set; }
 
-        [Display(Name = "Time Estimated")]
         public byte? TimeEstimated { get; set; }
 
         public byte Mark { get; set; }
@@ -53,12 +46,9 @@ namespace MvcToDo.Models
         public bool Status { get; set; }
 
         [Column(TypeName = "smalldatetime")]
-        [DataType(DataType.Date)]
-        //[DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Created { get; set; }
 
         [Column(TypeName = "smalldatetime")]
-        [Display(Name = "Last Modified")]
         public DateTime LastModified { get; set; }
 
         [Required]
@@ -67,21 +57,24 @@ namespace MvcToDo.Models
 
         public bool Active { get; set; }
 
-        [Required]
         public int Category { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comments> Comments { get; set; }
 
         public virtual Project Project { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskAssigned> TaskAssigned { get; set; }
 
+        public virtual TaskCategory TaskCategory { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskFiles> TaskFiles { get; set; }
 
         public virtual TaskMark TaskMark { get; set; }
 
-        public virtual TaskCategory TaskCategory { get; set; }
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskLifecycle> TaskLifecycle { get; set; }
     }
 }

@@ -1,20 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity;
+﻿using DbModel;
+using Microsoft.AspNet.Identity;
+using MvcToDo.ModelsView;
+using MvcToDo.Persistence;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using MvcToDo.App_Code;
-using MvcToDo.Models;
-using MvcToDo.ModelsView;
+
 namespace MvcToDo.Controllers
 {
     [Authorize]
     public class ProjectsController : Controller
     {
-        private ModelContext db = new ModelContext();
-
+        UnitOfWork _repo;
+        public ProjectsController()
+        {
+            _repo = new UnitOfWork(new ModelContext());
+        }
         // GET: Projects
         public ActionResult Index()
         {
@@ -24,42 +27,17 @@ namespace MvcToDo.Controllers
                 // if the tables has many rows, two small selects will cost less than a 3-tables join, so
                 // get the customer for this user
                 string currentUserId = User.Identity.GetUserId();
-                int customerId = db.CustomerUser.Where(x => x.UserId == currentUserId).Select(x => x.CustomerId).FirstOrDefault();
+                int customerId = _repo.CustomerUser.GetCustomerIdByUserId(currentUserId);
                 // now get the projects that belong to this customer
-                item = db.Project
-                    .Where(x => x.CustomerId == customerId && x.Active == true)
-                    .Select(x => new { Id = x.Id, Name = x.Name })
-                    .AsEnumerable().Select(x => new SimpleList { Id = x.Id, Name = x.Name }).ToList();
+                item = _repo.Project.GetProjectsByCustomerId(customerId).ToList();
             }
             else if (User.IsInRole("admin"))
             {
-                item = (from p in db.Project
-                        where  p.Active
-                        select new
-                        {
-                            Id = p.Id,
-                            Name = p.Name
-                        }).Distinct()
-                        .AsEnumerable()
-                        .Select(x => new SimpleList { Id = x.Id, Name = x.Name }).ToList();
+                item = _repo.Project.GetAllProjectSimpleList(true).ToList();
             }
             else
             {
-                string usrId = User.Identity.GetUserId();
-                item = (from p in db.Project
-                        join t in db.TaskItem on p.Id equals t.ProjectId
-                        join a in db.TaskAssigned on t.Id equals a.TaskId
-                        where a.AssignedTo == usrId
-                            && a.Active
-                            && p.Active
-                            && t.Active
-                        select new
-                        {
-                            Id = p.Id,
-                            Name = p.Name
-                        }).Distinct()
-                        .AsEnumerable()
-                        .Select(x => new SimpleList { Id = x.Id, Name = x.Name }).ToList();
+                item = _repo.Project.GetUserProjects(User.Identity.GetUserId()).ToList();
             }
             return View(item);
         }
@@ -73,17 +51,16 @@ namespace MvcToDo.Controllers
             }
 
             Project project = null;
-            Helpers _helper = new Helpers();
             string userId = User.Identity.GetUserId();
             if (User.IsInRole("customer"))
             {
                 string currentUserId = User.Identity.GetUserId();
-                int customerId = db.CustomerUser.Where(x => x.UserId == currentUserId).Select(x => x.CustomerId).FirstOrDefault();
-                project = db.Project.Where(x => x.CustomerId == customerId && x.Id == id && x.Active == true).FirstOrDefault();
+                int customerId = _repo.CustomerUser.GetCustomerIdByUserId(currentUserId);
+                project = _repo.Project.GetSingle(x => x.CustomerId == customerId && x.Id == id.Value && x.Active);
             }
-            else if (User.IsInRole("admin") || _helper.UserAccessProject(userId, id.Value))
+            else if (User.IsInRole("admin") || _repo.TaskAssigned.UserAccessProject(userId, id.Value))
             {
-                project = db.Project.Find(id);
+                project = _repo.Project.Get(id.Value);
             }
             else
             {
@@ -103,7 +80,8 @@ namespace MvcToDo.Controllers
         [Authorize(Roles = "admin,projectCRUD")]
         public ActionResult Create()
         {
-            ViewBag.Customers = new SelectList(db.Customer.Where(x => x.Active == true).Select(x => new { x.Id, x.Name }).ToList(), "Id", "Name", "");
+            var customers = _repo.Customer.Find(x => x.Active).AsEnumerable().Select(x => new { x.Id, x.Name }).ToList();
+            ViewBag.Customers = new SelectList(customers, "Id", "Name", "");
             return View();
         }
 
@@ -127,8 +105,8 @@ namespace MvcToDo.Controllers
             TryValidateModel(project);
             if (ModelState.IsValid)
             {
-                db.Project.Add(project);
-                db.SaveChanges();
+                _repo.Project.Add(project);
+                _repo.Persist();
                 return RedirectToAction("Index");
             }
             else
@@ -147,7 +125,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = db.Project.Where(x => x.Id == id && x.Active).FirstOrDefault();
+            Project project = _repo.Project.GetSingle(x => x.Active && x.Id == id.Value);
 
             if (project == null)
             {
@@ -155,8 +133,8 @@ namespace MvcToDo.Controllers
             }
 
             project.Description = HttpUtility.HtmlDecode(project.Description);
-
-            ViewBag.Customers = new SelectList(db.Customer.Where(x => x.Active == true).Select(x => new { x.Id, x.Name }).ToList(), "Id", "Name", project.CustomerId);
+            var customers = _repo.Customer.Find(x => x.Active).AsEnumerable().Select(x => new { x.Id, x.Name }).ToList();
+            ViewBag.Customers = new SelectList(customers, "Id", "Name", project.CustomerId);
             return View(project);
         }
 
@@ -169,7 +147,7 @@ namespace MvcToDo.Controllers
         public ActionResult Edit([Bind(Include = "Id,Name,Description,CustomerId")] Project project)
         {
             ModelState.Clear();
-            var item = db.Project.Where(x => x.Id == project.Id && x.Active).FirstOrDefault();
+            var item = _repo.Project.GetSingle(x => x.Active && x.Id == project.Id);
             if (item != null)
             {
                 item.Name = project.Name;
@@ -178,8 +156,8 @@ namespace MvcToDo.Controllers
                 TryValidateModel(item);
                 if (ModelState.IsValid)
                 {
-                    db.Entry(item).State = EntityState.Modified;
-                    db.SaveChanges();
+                    _repo.Project.Update(item);
+                    _repo.Persist();
                     return RedirectToAction("Index");
                 }
             }
@@ -198,7 +176,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Project project = db.Project.Where(x => x.Id == id && x.Active).FirstOrDefault();
+            Project project = _repo.Project.GetSingle(x => x.Active && x.Id == id.Value);
             if (project == null)
             {
                 return HttpNotFound();
@@ -214,10 +192,10 @@ namespace MvcToDo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Project project = db.Project.Find(id);
+            Project project = _repo.Project.GetSingle(x => x.Active && x.Id == id);
             project.Active = false;
-            db.Entry(project).State = EntityState.Modified;
-            db.SaveChanges();
+            _repo.Project.Update(project);
+            _repo.Persist();
             return RedirectToAction("Index");
         }
 
@@ -225,7 +203,7 @@ namespace MvcToDo.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _repo.Dispose();
             }
             base.Dispose(disposing);
         }

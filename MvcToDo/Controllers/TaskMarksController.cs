@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using MvcToDo.Models;
+using MvcToDo.Persistence;
+using DbModel;
 
 namespace MvcToDo.Controllers
 {
     [Authorize(Roles="admin")]
     public class TaskMarksController : Controller
     {
-        private ModelContext db = new ModelContext();
-
+        UnitOfWork _repo;
+        public TaskMarksController()
+        {
+            _repo = new UnitOfWork(new ModelContext());
+        }
+        
         // GET: TaskMarks
         public ActionResult Index()
         {
-            return View(db.TaskMark.Where(x => x.Active).ToList());
+            return View(_repo.TaskMark.Find(x => x.Active).ToList());
         }
 
         // GET: TaskMarks/Create
@@ -37,8 +37,8 @@ namespace MvcToDo.Controllers
             taskMark.Active = true;
             if (ModelState.IsValid)
             {
-                db.TaskMark.Add(taskMark);
-                db.SaveChanges();
+                _repo.TaskMark.Add(taskMark);
+                _repo.Persist();
                 return RedirectToAction("Index");
             }
 
@@ -52,7 +52,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            TaskMark taskMark = db.TaskMark.Where(x => x.Active && x.Id == id).FirstOrDefault();
+            TaskMark taskMark = _repo.TaskMark.GetSingle(x => x.Active && x.Id == id.Value);
             if (taskMark == null)
             {
                 return HttpNotFound();
@@ -67,15 +67,15 @@ namespace MvcToDo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Caption")] TaskMark taskMark)
         {
-            var dbitem = db.TaskMark.Where(x => x.Active && x.Id == taskMark.Id).FirstOrDefault();
+            var dbitem = _repo.TaskMark.GetSingle(x => x.Active && x.Id == taskMark.Id);
             if (dbitem == null)
                 return HttpNotFound();
             
             if (ModelState.IsValid)
             {
                 dbitem.Caption = taskMark.Caption;
-                db.Entry(dbitem).State = EntityState.Modified;
-                db.SaveChanges();
+                _repo.TaskMark.Update(dbitem);
+                _repo.Persist();
                 return RedirectToAction("Index");
             }
             return View(taskMark);
@@ -88,7 +88,7 @@ namespace MvcToDo.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            TaskMark taskMark = db.TaskMark.Where(x => x.Active && x.Id == id).FirstOrDefault();
+            TaskMark taskMark = _repo.TaskMark.GetSingle(x => x.Active && x.Id == id);
             if (taskMark == null)
             {
                 return HttpNotFound();
@@ -101,10 +101,11 @@ namespace MvcToDo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(byte id)
         {
-            TaskMark taskMark = db.TaskMark.Where(x => x.Active && x.Id == id).FirstOrDefault();
+            TaskMark taskMark = _repo.TaskMark.GetSingle(x => x.Active && x.Id == id);
             taskMark.Active = false;
-            db.Entry(taskMark).State = EntityState.Modified;
-            db.SaveChanges();
+            _repo.TaskMark.Update(taskMark);
+            _repo.Persist();
+
             return RedirectToAction("Index");
         }
 
@@ -112,7 +113,7 @@ namespace MvcToDo.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                _repo.Dispose();
             }
             base.Dispose(disposing);
         }

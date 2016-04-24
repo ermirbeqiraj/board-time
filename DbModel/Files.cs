@@ -1,4 +1,4 @@
-namespace MvcToDo.Models
+namespace DbModel
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace MvcToDo.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Files()
         {
-            TaskFiles = new HashSet<TaskFiles>(); // per mos me leju null
+            TaskFiles = new HashSet<TaskFiles>();
         }
 
         public int Id { get; set; }
@@ -36,6 +36,7 @@ namespace MvcToDo.Models
         [Column(TypeName = "smalldatetime")]
         public DateTime Created { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TaskFiles> TaskFiles { get; set; }
     }
 }

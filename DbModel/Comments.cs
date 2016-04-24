@@ -1,4 +1,4 @@
-namespace MvcToDo.Models
+namespace DbModel
 {
     using System;
     using System.Collections.Generic;
@@ -6,22 +6,22 @@ namespace MvcToDo.Models
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("TaskAssigned")]
-    public partial class TaskAssigned
+    public partial class Comments
     {
         public int Id { get; set; }
 
-        public int TaskId { get; set; }
-
-        [Required]
         [StringLength(36)]
         public string Author { get; set; }
 
-        [Required]
-        [StringLength(36)]
-        public string AssignedTo { get; set; }
+        public int? TaskId { get; set; }
 
-        public bool Active { get; set; }
+        [StringLength(3500)]
+        public string Comment { get; set; }
+
+        public bool? Active { get; set; }
+
+        [Column(TypeName = "smalldatetime")]
+        public DateTime? Created { get; set; }
 
         public virtual TaskItem TaskItem { get; set; }
     }
