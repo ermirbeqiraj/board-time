@@ -4,11 +4,13 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using MvcToDo.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace MvcToDo.Models
 {
     public class Initializer : IDisposable
     {
+        
         UnitOfWork _repo;
         public Initializer()
         {
@@ -131,9 +133,35 @@ namespace MvcToDo.Models
             return _success;
         }
 
+        #region Dispose
+        private IntPtr nativeResource = Marshal.AllocHGlobal(100);
+        ~Initializer()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
-            _repo.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_repo != null)
+                {
+                    _repo.Dispose();
+                    _repo = null;
+                }
+            }
+            if (nativeResource != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(nativeResource);
+                nativeResource = IntPtr.Zero;
+            }
+        } 
+        #endregion
     }
 }

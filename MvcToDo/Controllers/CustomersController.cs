@@ -1,10 +1,8 @@
-﻿using System.Data;
-using System.Data.Entity;
+﻿using DbModel;
+using MvcToDo.Persistence;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
-using MvcToDo.Persistence;
-using DbModel;
 
 namespace MvcToDo.Controllers
 {
@@ -14,7 +12,7 @@ namespace MvcToDo.Controllers
         UnitOfWork _repo;
         public CustomersController()
         {
-            _repo = new UnitOfWork(new Persistence.ModelContext());
+            _repo = new UnitOfWork(new ModelContext());
         }
         
         // GET: Customers

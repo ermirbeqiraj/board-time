@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using System.Data.Entity;
 using DbModel;
 namespace MvcToDo.Persistence
 {
@@ -12,11 +8,7 @@ namespace MvcToDo.Persistence
             : base("name=ModelContext")
         {
             Configuration.LazyLoadingEnabled = false;
-            //Database.SetInitializer<ModelContext>(new DropCreateDatabaseIfModelChanges<ModelContext>());
             Database.SetInitializer<ModelContext>(new CreateDatabaseIfNotExists<ModelContext>());
-            //Database.SetInitializer<ModelContext>(null);
-            //Database.SetInitializer<ModelContext>(new ModelContextInitializer());
-            //Database.Initialize(true);
         }
 
         public virtual DbSet<Comments> Comments { get; set; }

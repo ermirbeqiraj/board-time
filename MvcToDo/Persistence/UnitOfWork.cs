@@ -2,6 +2,8 @@
 using MvcToDo.Core.Repository;
 using MvcToDo.Persistence.Repository;
 using System;
+using System.Runtime.InteropServices;
+
 namespace MvcToDo.Persistence
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
@@ -92,14 +94,41 @@ namespace MvcToDo.Persistence
             TaskMark = new TaskMarkRepository(_db);
         }
 
-        public void Dispose()
-        {
-            _db.Dispose();
-        }
-
         public int Persist()
         {
             return _db.SaveChanges();
         }
+
+        #region Dispose
+        private IntPtr nativeResource = Marshal.AllocHGlobal(100);
+        ~UnitOfWork()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_db != null)
+                {
+                    _db.Dispose();
+                    _db = null;
+                }
+            }
+            if (nativeResource != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(nativeResource);
+                nativeResource = IntPtr.Zero;
+            }
+        }
+        #endregion
+
     }
 }

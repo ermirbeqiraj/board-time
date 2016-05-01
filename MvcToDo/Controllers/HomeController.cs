@@ -80,28 +80,23 @@ namespace MvcToDo.Controllers
             try
             {
                 string from = User.Identity.Name;
-
-                using (ModelContext _db = new ModelContext())
-                {
-                    var convItem = _repo.Conversation.GetSingle(x => (x.Usr_1 == from && x.Usr_2 == to) || (x.Usr_1 == to && x.Usr_2 == from));
-                    var conversation = new { Id = convItem.Id, Asc = (convItem.Usr_1 == from) };
-
-                    if (conversation == null)
-                    {// it is the very first message between them, so lets create the conversation row
-                        Conversation c = new Conversation
-                        {
-                            Usr_1 = from,
-                            Usr_2 = to
-                        };
-                        _repo.Conversation.Add(c);
-                        _repo.Persist();
-                        // c# is really really cool
-                        conversation = new { Id = c.Id, Asc = true };
-                    }
-                    _repo.Chat.Add(new Chat { ConversationId = conversation.Id, Created = time, Message = message, OrderedAsc = conversation.Asc });
+                var convItem = _repo.Conversation.GetSingle(x => (x.Usr_1 == from && x.Usr_2 == to) || (x.Usr_1 == to && x.Usr_2 == from));
+                var conversation = new { Id = convItem.Id, Asc = (convItem.Usr_1 == from) };
+                if (conversation == null)
+                {// it is the very first message between them, so lets create the conversation row
+                    Conversation c = new Conversation
+                    {
+                        Usr_1 = from,
+                        Usr_2 = to
+                    };
+                    _repo.Conversation.Add(c);
                     _repo.Persist();
-                    result.Status = true;
+                    // c# is really really cool
+                    conversation = new { Id = c.Id, Asc = true };
                 }
+                _repo.Chat.Add(new Chat { ConversationId = conversation.Id, Created = time, Message = message, OrderedAsc = conversation.Asc });
+                _repo.Persist();
+                result.Status = true;
             }
             catch (Exception ex)
             {
@@ -219,7 +214,6 @@ namespace MvcToDo.Controllers
         [OutputCache(Duration = 300, Location = OutputCacheLocation.ServerAndClient, VaryByParam = "none")]
         public JsonResult GetTaskCategoryPerUser()
         {
-            var db = new ModelContext();
             var dbitems = _repo.TaskAssigned.CountTaskCategoryPerUser().ToList();
             dbitems.ForEach(u => u.User = UserManager.Users.Where(x => x.Id == u.User).FirstOrDefault().UserName);
             return Json(dbitems, JsonRequestBehavior.AllowGet);
